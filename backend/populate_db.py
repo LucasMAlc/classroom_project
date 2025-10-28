@@ -1,7 +1,9 @@
-"""
-Script para popular o banco de dados com dados de teste
-Execute: python manage.py shell < populate_db.py
-"""
+import os
+import django
+
+# Configurar Django
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'classroom_project.settings')
+django.setup()
 
 from django.contrib.auth.models import User
 from classroom.models import Treinamento, Turma, Recurso, Aluno, Matricula
@@ -9,7 +11,7 @@ from datetime import date, timedelta
 
 print("🚀 Iniciando população do banco de dados...")
 
-# Limpar dados existentes (cuidado em produção!)
+# Limpar dados existentes
 print("🗑️  Limpando dados antigos...")
 Matricula.objects.all().delete()
 Recurso.objects.all().delete()
@@ -41,7 +43,6 @@ print("\n🎓 Criando turmas...")
 hoje = date.today()
 
 turmas = [
-    # Turma futura (não iniciada)
     Turma.objects.create(
         treinamento=treinamentos[0],
         nome="Python Iniciantes - Turma Janeiro 2026",
@@ -49,7 +50,6 @@ turmas = [
         data_conclusao=hoje + timedelta(days=150),
         link_acesso="https://zoom.us/j/111111"
     ),
-    # Turma em andamento
     Turma.objects.create(
         treinamento=treinamentos[1],
         nome="Django DRF - Turma Outubro 2025",
@@ -57,7 +57,6 @@ turmas = [
         data_conclusao=hoje + timedelta(days=50),
         link_acesso="https://zoom.us/j/222222"
     ),
-    # Turma iniciando hoje
     Turma.objects.create(
         treinamento=treinamentos[2],
         nome="React - Turma Intensiva",
@@ -71,7 +70,6 @@ print(f"✅ {len(turmas)} turmas criadas")
 # 3. Criar Recursos
 print("\n📁 Criando recursos...")
 
-# Recursos para Turma 1 (futura - só acesso prévio visível)
 recursos_turma1 = [
     Recurso.objects.create(
         turma=turmas[0],
@@ -113,7 +111,6 @@ recursos_turma1 = [
     ),
 ]
 
-# Recursos para Turma 2 (em andamento)
 recursos_turma2 = [
     Recurso.objects.create(
         turma=turmas[1],
@@ -154,7 +151,6 @@ recursos_turma2 = [
     ),
 ]
 
-# Recursos para Turma 3 (iniciando hoje)
 recursos_turma3 = [
     Recurso.objects.create(
         turma=turmas[2],
@@ -206,31 +202,23 @@ for aluno_data in alunos_data:
     alunos.append(aluno)
 
 print(f"✅ {len(alunos)} alunos criados")
-print("   Senha padrão para todos: senha123")
+print("   Senha padrão: senha123")
 
 # 5. Criar Matrículas
 print("\n📝 Criando matrículas...")
 
 matriculas = [
-    # João matriculado em todas as turmas
     Matricula.objects.create(turma=turmas[0], aluno=alunos[0]),
     Matricula.objects.create(turma=turmas[1], aluno=alunos[0]),
     Matricula.objects.create(turma=turmas[2], aluno=alunos[0]),
-    
-    # Maria matriculada nas turmas 1 e 2
     Matricula.objects.create(turma=turmas[0], aluno=alunos[1]),
     Matricula.objects.create(turma=turmas[1], aluno=alunos[1]),
-    
-    # Pedro matriculado na turma 2
     Matricula.objects.create(turma=turmas[1], aluno=alunos[2]),
-    
-    # Ana matriculada na turma 3
     Matricula.objects.create(turma=turmas[2], aluno=alunos[3]),
 ]
 
 print(f"✅ {len(matriculas)} matrículas criadas")
 
-# Resumo
 print("\n" + "="*60)
 print("🎉 BANCO DE DADOS POPULADO COM SUCESSO!")
 print("="*60)
@@ -240,14 +228,7 @@ print(f"   • {len(turmas)} Turmas")
 print(f"   • {total_recursos} Recursos")
 print(f"   • {len(alunos)} Alunos")
 print(f"   • {len(matriculas)} Matrículas")
-print(f"\n🔑 Credenciais de teste:")
+print(f"\n🔑 Credenciais:")
 print(f"   Admin: admin / admin123")
-print(f"   Aluno: joao / senha123")
-print(f"   Aluno: maria / senha123")
-print(f"   Aluno: pedro / senha123")
-print(f"   Aluno: ana / senha123")
-print(f"\n📅 Status das Turmas:")
-print(f"   • Turma 1 (Python): Inicia em {turmas[0].data_inicio} (futura)")
-print(f"   • Turma 2 (Django): Iniciou em {turmas[1].data_inicio} (ativa)")
-print(f"   • Turma 3 (React): Inicia em {turmas[2].data_inicio} (hoje)")
+print(f"   Alunos: joao, maria, pedro, ana / senha123")
 print("="*60)
