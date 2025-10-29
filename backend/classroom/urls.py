@@ -4,7 +4,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from .views import (
     TreinamentoViewSet, TurmaViewSet, RecursoViewSet,
     AlunoViewSet, MatriculaViewSet, MeusDadosView,
-    MinhasTurmasView, RegistrationView, DownloadRecursoView  # ← ADICIONAR
+    MinhasTurmasView, RegistrationView, DownloadRecursoView
 )
 
 router = DefaultRouter()

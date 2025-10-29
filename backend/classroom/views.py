@@ -1,20 +1,24 @@
+import os
+from datetime import date
+from django.contrib.auth.models import User
+from django.http import FileResponse, Http404
+from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from django.contrib.auth.models import User
 from .models import Treinamento, Turma, Recurso, Aluno, Matricula
 from .serializers import (
-    TreinamentoSerializer, TurmaSerializer, RecursoSerializer,
-    AlunoSerializer, MatriculaSerializer, UserRegistrationSerializer,
+    TreinamentoSerializer,
+    TurmaSerializer,
+    RecursoSerializer,
+    AlunoSerializer,
+    MatriculaSerializer,
+    UserRegistrationSerializer,
     TurmaAlunoSerializer
 )
 from .permissions import IsAdminOrReadOnly, IsOwnerOrAdmin
-from django.http import FileResponse, Http404
-from django.shortcuts import get_object_or_404
-import os
 from .filters import TurmaFilter, RecursoFilter
-from datetime import date
 
 class DownloadRecursoView(APIView):
     """Endpoint para download seguro de recursos"""
