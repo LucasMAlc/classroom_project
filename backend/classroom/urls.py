@@ -4,7 +4,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from .views import (
     TreinamentoViewSet, TurmaViewSet, RecursoViewSet,
     AlunoViewSet, MatriculaViewSet, MeusDadosView,
-    MinhasTurmasView, RegistrationView
+    MinhasTurmasView, RegistrationView, DownloadRecursoView  # ← ADICIONAR
 )
 
 router = DefaultRouter()
@@ -23,6 +23,9 @@ urlpatterns = [
     # Endpoints específicos do aluno
     path('meus-dados/', MeusDadosView.as_view(), name='meus-dados'),
     path('minhas-turmas/', MinhasTurmasView.as_view(), name='minhas-turmas'),
+    
+    # Download de recursos
+    path('recursos/<int:recurso_id>/download/', DownloadRecursoView.as_view(), name='download-recurso'),  
     
     # Rotas do router
     path('', include(router.urls)),
