@@ -14,6 +14,7 @@ from django.http import FileResponse, Http404
 from django.shortcuts import get_object_or_404
 import os
 from .filters import TurmaFilter, RecursoFilter
+from datetime import date
 
 class DownloadRecursoView(APIView):
     """Endpoint para download seguro de recursos"""
