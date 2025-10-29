@@ -10,7 +10,91 @@ from .serializers import (
     TurmaAlunoSerializer
 )
 from .permissions import IsAdminOrReadOnly, IsOwnerOrAdmin
+from django.http import FileResponse, Http404
+from django.shortcuts import get_object_or_404
+import os
+from .filters import TurmaFilter, RecursoFilter
 
+class DownloadRecursoView(APIView):
+    """Endpoint para download seguro de recursos"""
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, recurso_id):
+        recurso = get_object_or_404(Recurso, id=recurso_id)
+        
+        # Verificar se o usuário tem permissão
+        user = request.user
+        
+        # Admin pode baixar qualquer recurso
+        if user.is_staff:
+            if not recurso.arquivo:
+                return Response(
+                    {'error': 'Recurso não possui arquivo'},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+            
+            file_path = recurso.arquivo.path
+            if os.path.exists(file_path):
+                return FileResponse(
+                    open(file_path, 'rb'),
+                    as_attachment=True,
+                    filename=os.path.basename(file_path)
+                )
+            raise Http404("Arquivo não encontrado")
+        
+        # Aluno precisa validar permissões
+        try:
+            aluno = user.aluno
+            
+            # Verificar se está matriculado na turma
+            if not Matricula.objects.filter(
+                aluno=aluno,
+                turma=recurso.turma,
+                ativo=True
+            ).exists():
+                return Response(
+                    {'error': 'Você não está matriculado nesta turma'},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+            
+            # Aplicar regras de negócio
+            hoje = date.today()
+            turma_iniciou = hoje >= recurso.turma.data_inicio
+            
+            # Verificar se pode acessar
+            if recurso.draft:
+                return Response(
+                    {'error': 'Recurso não disponível'},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+            
+            if not turma_iniciou and not recurso.acesso_previo:
+                return Response(
+                    {'error': 'Recurso disponível apenas após início da turma'},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+            
+            # Permitir download
+            if not recurso.arquivo:
+                return Response(
+                    {'error': 'Recurso não possui arquivo'},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+            
+            file_path = recurso.arquivo.path
+            if os.path.exists(file_path):
+                return FileResponse(
+                    open(file_path, 'rb'),
+                    as_attachment=True,
+                    filename=os.path.basename(file_path)
+                )
+            raise Http404("Arquivo não encontrado")
+            
+        except Aluno.DoesNotExist:
+            return Response(
+                {'error': 'Perfil de aluno não encontrado'},
+                status=status.HTTP_404_NOT_FOUND
+            )
 
 class IsAdminUser(permissions.BasePermission):
     """Permissão apenas para administradores"""
@@ -34,6 +118,7 @@ class TurmaViewSet(viewsets.ModelViewSet):
     queryset = Turma.objects.all()
     serializer_class = TurmaSerializer
     permission_classes = [permissions.IsAuthenticated]
+    filterset_class = TurmaFilter
 
     def get_permissions(self):
         """Permite leitura para todos autenticados, escrita só admin"""
@@ -62,6 +147,7 @@ class RecursoViewSet(viewsets.ModelViewSet):
     queryset = Recurso.objects.all()
     serializer_class = RecursoSerializer
     permission_classes = [permissions.IsAuthenticated, IsAdminUser]
+    filterset_class = RecursoFilter 
 
     def get_queryset(self):
         """Permite filtrar por turma"""
