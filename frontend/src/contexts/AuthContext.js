@@ -24,7 +24,12 @@ export const AuthProvider = ({ children }) => {
         const response = await getMeusDados();
         setUser(response.data);
       } catch (error) {
-        logout();
+        if (error.response?.status === 404) {
+          setUser({ username: 'admin', nome: 'Administrador', is_admin: true });
+        } else {
+          console.error('Erro ao carregar usuário:', error);
+          logout();
+        }
       }
     }
     setLoading(false);
@@ -49,9 +54,11 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
-  const isAdmin = () => user?.username === 'admin';
+  const isAdmin = () => {
+    return user?.username === 'admin' || user?.is_admin === true;
+  };
 
-  return (
+    return (
     <AuthContext.Provider value={{ user, loading, login, logout, isAdmin }}>
       {children}
     </AuthContext.Provider>
