@@ -51,7 +51,7 @@ Disponivel em: http://localhost:3000
 
 ## Swagger
 
-- `/api/docs/` -
+- `/api/docs/` - Documentação interativa da API
 
 ## Teste
 ```bash
