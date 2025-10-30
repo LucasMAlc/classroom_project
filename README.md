@@ -5,7 +5,7 @@ Sistema de gestão de turmas.
 ## Tecnologias
 
 **Backend:** Python 3.13 | Django 5.2.7 | DRF | JWT | SQLite  
-**Frontend:** React 18 | React Router | Axios
+**Frontend:** React | React Router | Axios
 
 ## Instalação
 
